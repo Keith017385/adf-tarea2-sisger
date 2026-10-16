@@ -1,5 +1,5 @@
 {
-	"name": "incidentes_csv",
+	"name": "bronze_incidentes_csv",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "sa_transporte",
