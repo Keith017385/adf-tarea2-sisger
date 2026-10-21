@@ -1,5 +1,5 @@
 {
-	"name": "bronze_demandas_paradas_2022_xls",
+	"name": "bronze_demandas_paradas_xls",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "sa_transporte",
