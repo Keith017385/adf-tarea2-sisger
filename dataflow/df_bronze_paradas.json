@@ -33,9 +33,6 @@
 			"transformations": [
 				{
 					"name": "select1"
-				},
-				{
-					"name": "union1"
 				}
 			],
 			"scriptLines": [
@@ -82,18 +79,17 @@
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false) ~> xls",
 				"csv select(mapColumn(",
-				"          fec_servicio,",
-				"          cod_ruta,",
 				"          nro_parada,",
-				"          franja,",
-				"          abordajes_manuales,",
-				"          descensos_manuales,",
-				"          demanda_no_atendida,",
-				"          medicion",
+				"          nombre_parada,",
+				"          zona,",
+				"          latitud,",
+				"          longitud,",
+				"          fecha_desde,",
+				"          fecha_hasta,",
+				"          estado",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> select1",
-				"select1, sql union(byName: true)~> union1"
+				"     skipDuplicateMapOutputs: true) ~> select1"
 			]
 		}
 	}
