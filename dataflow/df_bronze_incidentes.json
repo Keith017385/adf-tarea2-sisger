@@ -29,13 +29,33 @@
 					"name": "xls"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "dw_silver_incidentes_sql",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
 			"transformations": [
 				{
 					"name": "select1"
 				},
 				{
 					"name": "select2"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "union1"
+				},
+				{
+					"name": "union2"
 				}
 			],
 			"scriptLines": [
@@ -86,36 +106,73 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false) ~> xls",
-				"csv select(mapColumn(",
+				"derivedColumn1 select(mapColumn(",
 				"          IncidenteId = id_incidente,",
 				"          TipoIncidente = tipo,",
 				"          Severidad = severidad,",
 				"          FechaHoraInicio = fecha_inicio,",
-				"          FechaHoraInicio = hora_inicio,",
 				"          FechaHoraFin = fecha_fin,",
-				"          FechaHoraFin = hora_fin,",
 				"          FechaHoraRegistro = fecha_registro,",
-				"          Descripcion = rutas_afectadas,",
 				"          VehiculoId = vehiculo_afectado,",
 				"          Descripcion = descripcion",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> select1",
-				"xls select(mapColumn(",
+				"derivedColumn2 select(mapColumn(",
 				"          IncidenteId = id_incidente,",
 				"          TipoIncidente = tipo,",
 				"          Severidad = severidad,",
 				"          FechaHoraInicio = fecha_inicio,",
-				"          FechaHoraInicio = hora_inicio,",
 				"          FechaHoraFin = fecha_fin,",
-				"          FechaHoraFin = hora_fin,",
 				"          FechaHoraRegistro = fecha_registro,",
-				"          Descripcion = rutas_afectadas,",
 				"          VehiculoId = vehiculo_afectado,",
 				"          Descripcion = descripcion",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> select2"
+				"     skipDuplicateMapOutputs: true) ~> select2",
+				"csv derive(fecha_inicio = concat(\r",
+				"    toString(fecha_inicio),\r",
+				"    ' ',\r",
+				"    toString(hora_inicio)\r",
+				"),",
+				"          fecha_fin = concat(\r",
+				"    toString(fecha_fin),\r",
+				"    ' ',\r",
+				"    toString(hora_fin)\r",
+				")) ~> derivedColumn1",
+				"xls derive(fecha_inicio = concat(\r",
+				"    toString(fecha_inicio),\r",
+				"    ' ',\r",
+				"    toString(hora_inicio)\r",
+				"),",
+				"          fecha_fin = concat(\r",
+				"    toString(fecha_fin),\r",
+				"    ' ',\r",
+				"    toString(hora_fin)\r",
+				")) ~> derivedColumn2",
+				"select1, sql union(byName: true)~> union1",
+				"union1, select2 union(byName: true)~> union2",
+				"union2 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          AnioFuente as string,",
+				"          IncidenteId as string,",
+				"          TipoIncidente as string,",
+				"          Severidad as string,",
+				"          FechaHoraInicio as string,",
+				"          FechaHoraFin as string,",
+				"          FechaHoraRegistro as string,",
+				"          VehiculoId as string,",
+				"          Descripcion as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
 			]
 		}
 	}
