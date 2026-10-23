@@ -8,7 +8,11 @@
 		"typeProperties": {
 			"sources": [
 				{
-					"name": "csv"
+					"dataset": {
+						"referenceName": "bronze_incidente_ruta_sql",
+						"type": "DatasetReference"
+					},
+					"name": "sql"
 				},
 				{
 					"name": "source2"
@@ -17,8 +21,16 @@
 			"sinks": [],
 			"transformations": [],
 			"scriptLines": [
-				"source(allowSchemaDrift: true,",
-				"     validateSchema: false) ~> csv",
+				"source(output(",
+				"          AnioFuente as integer,",
+				"          IncidenteId as string,",
+				"          RutaHistoricaId as string,",
+				"          EsPrincipal as boolean",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> sql",
 				"source(allowSchemaDrift: true,",
 				"     validateSchema: false) ~> source2"
 			]
