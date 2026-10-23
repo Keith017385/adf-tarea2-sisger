@@ -30,7 +30,14 @@
 				}
 			],
 			"sinks": [],
-			"transformations": [],
+			"transformations": [
+				{
+					"name": "select1"
+				},
+				{
+					"name": "select2"
+				}
+			],
 			"scriptLines": [
 				"source(output(",
 				"          id_viaje as string,",
@@ -80,7 +87,37 @@
 				"     ),",
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     ignoreNoFilesFound: false) ~> xls"
+				"     ignoreNoFilesFound: false) ~> xls",
+				"csv select(mapColumn(",
+				"          ViajeId = id_viaje,",
+				"          RutaHistoriaId = cod_ruta,",
+				"          VehiculoId = nro_bus,",
+				"          FechaServicio = fec_servicio,",
+				"          HoraProgramada = hora_programada,",
+				"          HoraSalida = hora_salida,",
+				"          HoraLlegada = hora_llegada,",
+				"          pasajeros_reportados,",
+				"          KmRecorridos = km_recorridos,",
+				"          EstadoViaje = estado_viaje,",
+				"          tipo_metrica",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"xls select(mapColumn(",
+				"          id_viaje,",
+				"          cod_ruta,",
+				"          nro_bus,",
+				"          fecha_servicio,",
+				"          hora_programada,",
+				"          hora_salida,",
+				"          hora_llegada,",
+				"          pasajeros_estimados,",
+				"          km_recorridos,",
+				"          estado_viaje,",
+				"          tipo_metrica",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2"
 			]
 		}
 	}
