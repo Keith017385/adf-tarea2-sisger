@@ -29,7 +29,15 @@
 					"name": "xls"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "dw_bronze_paradas_sql",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
 			"transformations": [
 				{
 					"name": "select1"
@@ -100,7 +108,7 @@
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> select1",
 				"xls select(mapColumn(",
-				"          ParadaHistoriaId = nro_parada,",
+				"          ParadaHistoricaId = nro_parada,",
 				"          NombreParada = nombre_parada,",
 				"          Zona = zona,",
 				"          Latitud = latitud,",
@@ -112,7 +120,29 @@
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> select2",
 				"select1, sql union(byName: true)~> union1",
-				"union1, select2 union(byName: true)~> union2"
+				"union1, select2 union(byName: true)~> union2",
+				"union2 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          AnioFuente as string,",
+				"          ParadaHistoricaId as string,",
+				"          CodigoPublicado as string,",
+				"          NombreParada as string,",
+				"          Zona as string,",
+				"          Latitud as string,",
+				"          Longitud as string,",
+				"          VigenciaDesde as string,",
+				"          VigenciaHasta as string,",
+				"          Estado as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
 			]
 		}
 	}
