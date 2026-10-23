@@ -30,7 +30,20 @@
 				}
 			],
 			"sinks": [],
-			"transformations": [],
+			"transformations": [
+				{
+					"name": "select1"
+				},
+				{
+					"name": "select2"
+				},
+				{
+					"name": "union1"
+				},
+				{
+					"name": "union2"
+				}
+			],
 			"scriptLines": [
 				"source(output(",
 				"          cod_ruta as string,",
@@ -51,8 +64,8 @@
 				"          NombreRuta as string,",
 				"          Origen as string,",
 				"          Destino as string,",
-				"          VigenciaDesde as date,",
-				"          VigenciaHasta as date,",
+				"          VigenciaDesde as string,",
+				"          VigenciaHasta as string,",
 				"          Estado as string",
 				"     ),",
 				"     allowSchemaDrift: true,",
@@ -70,7 +83,31 @@
 				"     ),",
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     ignoreNoFilesFound: false) ~> xls"
+				"     ignoreNoFilesFound: false) ~> xls",
+				"csv select(mapColumn(",
+				"          CodigoRuta = cod_ruta,",
+				"          NombreRuta = nombre_ruta,",
+				"          Origen = origen,",
+				"          Destino = destino,",
+				"          VigenciaDesde = fecha_desde,",
+				"          VigenciaHasta = fecha_hasta,",
+				"          Estado = estado",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"xls select(mapColumn(",
+				"          CodigoRuta = cod_ruta,",
+				"          NombreRuta = nombre_ruta,",
+				"          Origen = origen,",
+				"          Destino = destino,",
+				"          VigenciaDesde = fecha_desde,",
+				"          VigenciaHasta = fecha_hasta,",
+				"          Estado = estado",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2",
+				"select1, sql union(byName: true)~> union1",
+				"union1, select2 union(byName: true)~> union2"
 			]
 		}
 	}
