@@ -27,6 +27,12 @@
 			"transformations": [
 				{
 					"name": "derivedColumn1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "derivedColumn3"
 				}
 			],
 			"scriptLines": [
@@ -50,10 +56,10 @@
 				"          CodigoPublicado = iif(isNull(CodigoPublicado) || trim(toString(CodigoPublicado)) == '', upper(trim(toString(ParadaHistoricaId))), upper(trim(toString(CodigoPublicado)))),",
 				"          NombreParada = regexReplace(trim(toString(NombreParada)), ' +', ' '),",
 				"          Zona = upper(regexReplace(trim(toString(Zona)), ' +', ' ')),",
-				"          Latitud = toDecimal(trim(toString(Latitud)), 9, 2),",
-				"          Longitud = toDecimal(trim(toString(Longitud)), 9, 2),",
-				"          Estado = upper(trim(toString(Estado))),",
-				"          VigenciaDesde = iif(isNull(VigenciaDesde) || trim(toString(VigenciaDesde)) == '',\r",
+				"          Estado = upper(trim(toString(Estado)))) ~> derivedColumn1",
+				"derivedColumn1 derive(Latitud = toDecimal(trim(toString(Latitud)), 9, 6),",
+				"          Longitud = toDecimal(trim(toString(Longitud)), 9, 6)) ~> derivedColumn2",
+				"derivedColumn2 derive(VigenciaDesde = iif(isNull(VigenciaDesde) || trim(toString(VigenciaDesde)) == '',\r",
 				"    toDate(null()),\r",
 				"    iif(isInteger(trim(toString(VigenciaDesde))),\r",
 				"        addDays(toDate('1899-12-30'), toInteger(trim(toString(VigenciaDesde)))),\r",
@@ -78,8 +84,8 @@
 				"            )\r",
 				"        )\r",
 				"    )\r",
-				")) ~> derivedColumn1",
-				"derivedColumn1 sink(allowSchemaDrift: true,",
+				")) ~> derivedColumn3",
+				"derivedColumn3 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          ParadaHistoricaId as string,",
@@ -99,18 +105,7 @@
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
-				"     errorHandlingOption: 'stopOnFirstError',",
-				"     mapColumn(",
-				"          ParadaHistoricaId,",
-				"          CodigoPublicado,",
-				"          NombreParada,",
-				"          Zona,",
-				"          Latitud,",
-				"          Longitud,",
-				"          VigenciaDesde,",
-				"          VigenciaHasta,",
-				"          Estado",
-				"     )) ~> sink1"
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
 			]
 		}
 	}
