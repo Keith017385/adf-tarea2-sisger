@@ -58,7 +58,7 @@
 			}
 		],
 		"typeProperties": {
-			"schema": "bronze",
+			"schema": "silver",
 			"table": "Paradas"
 		}
 	}
