@@ -18,7 +18,7 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "dw_silver_incidente_ruta_sql",
+						"referenceName": "dw_bronze_incidente_ruta_sql",
 						"type": "DatasetReference"
 					},
 					"name": "sink1"
@@ -39,10 +39,10 @@
 				"sql sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
-				"          AnioFuente as integer,",
+				"          AnioFuente as string,",
 				"          IncidenteId as string,",
 				"          RutaHistoricaId as string,",
-				"          EsPrincipal as boolean",
+				"          EsPrincipal as string",
 				"     ),",
 				"     deletable:false,",
 				"     insertable:true,",

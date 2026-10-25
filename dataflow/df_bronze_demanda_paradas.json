@@ -32,7 +32,7 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "dw_silver_demanda_paradas_sql",
+						"referenceName": "dw_bronze_demanda_paradas_sql",
 						"type": "DatasetReference"
 					},
 					"name": "sink1"
