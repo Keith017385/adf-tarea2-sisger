@@ -57,7 +57,7 @@
 			}
 		],
 		"typeProperties": {
-			"schema": "silver",
+			"schema": "bronze",
 			"table": "Viajes"
 		}
 	}

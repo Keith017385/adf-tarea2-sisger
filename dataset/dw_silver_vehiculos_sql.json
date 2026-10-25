@@ -47,7 +47,7 @@
 			}
 		],
 		"typeProperties": {
-			"schema": "silver",
+			"schema": "bronze",
 			"table": "Vehiculos"
 		}
 	}
