@@ -15,7 +15,15 @@
 					"name": "source1"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "dw_silver_incidentes_sql",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
 			"transformations": [
 				{
 					"name": "derivedColumn1"
@@ -25,6 +33,9 @@
 				},
 				{
 					"name": "derivedColumn3"
+				},
+				{
+					"name": "filter1"
 				}
 			],
 			"scriptLines": [
@@ -115,7 +126,29 @@
 				"    isNull(VehiculoId) || trim(toString(VehiculoId)) == '',\r",
 				"    toString(null()),\r",
 				"    upper(trim(toString(VehiculoId)))\r",
-				")) ~> derivedColumn3"
+				")) ~> derivedColumn3",
+				"derivedColumn3 filter(!isNull(VehiculoId)",
+				"&& trim(toString(VehiculoId)) != '') ~> filter1",
+				"filter1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          IncidenteId as string,",
+				"          TipoIncidente as string,",
+				"          Severidad as string,",
+				"          FechaHoraInicio as timestamp,",
+				"          FechaHoraFin as timestamp,",
+				"          FechaHoraRegistro as timestamp,",
+				"          VehiculoId as string,",
+				"          Descripcion as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
 			]
 		}
 	}
