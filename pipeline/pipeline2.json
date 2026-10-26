@@ -142,7 +142,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "df_silver_incidentes",
+						"referenceName": "df_bronze_incidentes",
 						"type": "DataFlowReference"
 					},
 					"compute": {
