@@ -141,16 +141,7 @@
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
-				"     errorHandlingOption: 'stopOnFirstError',",
-				"     mapColumn(",
-				"          IncidenteId,",
-				"          TipoIncidente,",
-				"          Severidad,",
-				"          FechaHoraInicio,",
-				"          FechaHoraFin,",
-				"          VehiculoId,",
-				"          Descripcion",
-				"     )) ~> sink1"
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
 			]
 		}
 	}
