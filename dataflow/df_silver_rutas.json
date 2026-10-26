@@ -30,6 +30,9 @@
 				},
 				{
 					"name": "derivedColumn2"
+				},
+				{
+					"name": "aggregate1"
 				}
 			],
 			"scriptLines": [
@@ -68,7 +71,7 @@
 				"          Origen = trim(toString(Origen)),",
 				"          Destino = trim(toString(Destino)),",
 				"          Estado = upper(trim(toString(Estado)))) ~> derivedColumn1",
-				"derivedColumn1 derive(VigenciaDesde = iif(\r",
+				"aggregate1 derive(VigenciaDesde = iif(\r",
 				"    instr(toString(VigenciaDesde), '/') > 0,\r",
 				"    toDate(toString(VigenciaDesde), 'dd/MM/yyyy'),\r",
 				"    iif(\r",
@@ -92,6 +95,14 @@
 				"        )\r",
 				"    )\r",
 				")) ~> derivedColumn2",
+				"derivedColumn1 aggregate(groupBy(RutaHistoricaId),",
+				"     CodigoRuta = first(CodigoRuta),",
+				"          NombreRuta = first(NombreRuta),",
+				"          Origen = first(Origen),",
+				"          Destino = first(Destino),",
+				"          VigenciaDesde = first(VigenciaDesde),",
+				"          VigenciaHasta = first(VigenciaHasta),",
+				"          Estado = first(Estado)) ~> aggregate1",
 				"derivedColumn2 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
