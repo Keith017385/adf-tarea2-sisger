@@ -33,6 +33,12 @@
 				},
 				{
 					"name": "derivedColumn3"
+				},
+				{
+					"name": "aggregate1"
+				},
+				{
+					"name": "filter1"
 				}
 			],
 			"scriptLines": [
@@ -52,12 +58,23 @@
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     format: 'table') ~> source1",
-				"source1 derive(ParadaHistoricaId = upper(trim(toString(ParadaHistoricaId))),",
+				"filter1 derive(ParadaHistoricaId = concat(\r",
+				"    'P',\r",
+				"    lpad(\r",
+				"        regexExtract(\r",
+				"            upper(trim(toString(ParadaHistoricaId))),\r",
+				"            '([0-9]+)',\r",
+				"            1\r",
+				"        ),\r",
+				"        3,\r",
+				"        '0'\r",
+				"    )\r",
+				"),",
 				"          CodigoPublicado = iif(isNull(CodigoPublicado) || trim(toString(CodigoPublicado)) == '', upper(trim(toString(ParadaHistoricaId))), upper(trim(toString(CodigoPublicado)))),",
 				"          NombreParada = regexReplace(trim(toString(NombreParada)), ' +', ' '),",
 				"          Zona = upper(regexReplace(trim(toString(Zona)), ' +', ' ')),",
 				"          Estado = upper(trim(toString(Estado)))) ~> derivedColumn1",
-				"derivedColumn1 derive(Latitud = toDecimal(trim(toString(Latitud)), 9, 6),",
+				"aggregate1 derive(Latitud = toDecimal(trim(toString(Latitud)), 9, 6),",
 				"          Longitud = toDecimal(trim(toString(Longitud)), 9, 6)) ~> derivedColumn2",
 				"derivedColumn2 derive(VigenciaDesde = iif(isNull(VigenciaDesde) || trim(toString(VigenciaDesde)) == '',\r",
 				"    toDate(null()),\r",
@@ -85,6 +102,18 @@
 				"        )\r",
 				"    )\r",
 				")) ~> derivedColumn3",
+				"derivedColumn1 aggregate(groupBy(ParadaHistoricaId),",
+				"     CodigoPublicado = first(CodigoPublicado),",
+				"          NombreParada = first(NombreParada),",
+				"          Zona = first(Zona),",
+				"          Latitud = first(Latitud),",
+				"          Longitud = first(Longitud),",
+				"          VigenciaDesde = first(VigenciaDesde),",
+				"          VigenciaHasta = first(VigenciaHasta),",
+				"          Estado = first(Estado)) ~> aggregate1",
+				"source1 filter(!isNull(ParadaHistoricaId)",
+				"&& trim(toString(ParadaHistoricaId)) != ''",
+				"&& regexMatch(trim(toString(ParadaHistoricaId)), '[0-9]+')) ~> filter1",
 				"derivedColumn3 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
