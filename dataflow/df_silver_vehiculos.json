@@ -15,10 +15,24 @@
 					"name": "source1"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "dw_silver_vehiculos_sql",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
 			"transformations": [
 				{
 					"name": "derivedColumn1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "derivedColumn3"
 				}
 			],
 			"scriptLines": [
@@ -36,7 +50,61 @@
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     format: 'table') ~> source1",
-				"source1 derive() ~> derivedColumn1"
+				"source1 derive(VehiculoId = concat(\r",
+				"    'V-',\r",
+				"    lpad(\r",
+				"        regexReplace(upper(trim(toString(VehiculoId))), '[^0-9]', ''),\r",
+				"        3,\r",
+				"        '0'\r",
+				"    )\r",
+				"),",
+				"          Placa = upper(trim(toString(Placa))),",
+				"          TipoVehiculo = upper(trim(toString(TipoVehiculo))),",
+				"          Estado = upper(trim(toString(Estado)))) ~> derivedColumn1",
+				"derivedColumn1 derive(CapacidadEfectiva = toInteger(trim(toString(CapacidadEfectiva)))) ~> derivedColumn2",
+				"derivedColumn2 derive(VigenciaDesde = iif(\r",
+				"    instr(toString(VigenciaDesde), '/') > 0,\r",
+				"    toDate(toString(VigenciaDesde), 'dd/MM/yyyy'),\r",
+				"    iif(\r",
+				"        instr(toString(VigenciaDesde), '-') > 0,\r",
+				"        toDate(toString(VigenciaDesde), 'yyyy-MM-dd'),\r",
+				"        addDays(\r",
+				"            toDate('1899-12-30'),\r",
+				"            toInteger(toString(VigenciaDesde))\r",
+				"        )\r",
+				"    )\r",
+				"),",
+				"          VigenciaHasta = iif(\r",
+				"    instr(toString(VigenciaHasta), '/') > 0,\r",
+				"    toDate(toString(VigenciaHasta), 'dd/MM/yyyy'),\r",
+				"    iif(\r",
+				"        instr(toString(VigenciaHasta), '-') > 0,\r",
+				"        toDate(toString(VigenciaHasta), 'yyyy-MM-dd'),\r",
+				"        addDays(\r",
+				"            toDate('1899-12-30'),\r",
+				"            toInteger(toString(VigenciaHasta))\r",
+				"        )\r",
+				"    )\r",
+				")) ~> derivedColumn3",
+				"derivedColumn3 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          VehiculoId as string,",
+				"          Placa as string,",
+				"          TipoVehiculo as string,",
+				"          CapacidadEfectiva as integer,",
+				"          VigenciaDesde as date,",
+				"          VigenciaHasta as date,",
+				"          Estado as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
 			]
 		}
 	}
