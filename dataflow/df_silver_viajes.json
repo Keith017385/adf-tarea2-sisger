@@ -18,6 +18,9 @@
 			"sinks": [],
 			"transformations": [
 				{
+					"name": "filter1"
+				},
+				{
 					"name": "derivedColumn1"
 				}
 			],
@@ -39,7 +42,17 @@
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     format: 'table') ~> source1",
-				"source1 derive() ~> derivedColumn1"
+				"source1 filter(!startsWith(upper(trim(toString(ViajeId))), 'TOTAL_')",
+				"&& !isNull(FechaServicio) && trim(toString(FechaServicio)) != ''",
+				"&& !isNull(RutaHistoricaId) && trim(toString(RutaHistoricaId)) != ''",
+				"&& !isNull(VehiculoId) && trim(toString(VehiculoId)) != ''",
+				"&& !isNull(HoraProgramada) && trim(toString(HoraProgramada)) != ''",
+				"&& !isNull(HoraSalida) && trim(toString(HoraSalida)) != ''",
+				"&& !isNull(HoraLlegada) && trim(toString(HoraLlegada)) != ''",
+				"&& !isNull(ValidacionesTarjeta) && trim(toString(ValidacionesTarjeta)) != ''",
+				"&& !isNull(KmRecorridos) && trim(toString(KmRecorridos)) != ''",
+				"&& !isNull(EstadoViaje) && trim(toString(EstadoViaje)) != '') ~> filter1",
+				"filter1 derive() ~> derivedColumn1"
 			]
 		}
 	}
