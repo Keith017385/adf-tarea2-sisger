@@ -15,13 +15,23 @@
 					"name": "source1"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"name": "sink1"
+				}
+			],
 			"transformations": [
 				{
 					"name": "filter1"
 				},
 				{
 					"name": "derivedColumn1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "derivedColumn3"
 				}
 			],
 			"scriptLines": [
@@ -52,7 +62,58 @@
 				"&& !isNull(ValidacionesTarjeta) && trim(toString(ValidacionesTarjeta)) != ''",
 				"&& !isNull(KmRecorridos) && trim(toString(KmRecorridos)) != ''",
 				"&& !isNull(EstadoViaje) && trim(toString(EstadoViaje)) != '') ~> filter1",
-				"filter1 derive() ~> derivedColumn1"
+				"filter1 derive(FechaServicio = iif(\r",
+				"    instr(toString(FechaServicio), '/') > 0,\r",
+				"    toDate(toString(FechaServicio), 'dd/MM/yyyy'),\r",
+				"    toDate(toString(FechaServicio), 'yyyy-MM-dd')\r",
+				"),",
+				"          ViajeId = upper(trim(toString(ViajeId))),",
+				"          VehiculoId = upper(trim(toString(VehiculoId))),",
+				"          RutaHistoricaId = concat(\r",
+				"    'RH-',\r",
+				"    lpad(\r",
+				"        regexReplace(upper(trim(toString(RutaHistoricaId))), '[^0-9]', ''),\r",
+				"        2,\r",
+				"        '0'\r",
+				"    )\r",
+				")) ~> derivedColumn1",
+				"derivedColumn1 derive(HoraProgramada = iif(\r",
+				"    instr(toString(HoraProgramada), 'T') > 0\r",
+				"    || instr(toString(HoraProgramada), ' ') > 0,\r",
+				"    substring(toString(HoraProgramada), 12, 8),\r",
+				"    iif(\r",
+				"        length(toString(HoraProgramada)) == 5,\r",
+				"        concat(toString(HoraProgramada), ':00'),\r",
+				"        toString(HoraProgramada)\r",
+				"    )\r",
+				"),",
+				"          HoraSalida = iif(\r",
+				"    instr(toString(HoraSalida), 'T') > 0\r",
+				"    || instr(toString(HoraSalida), ' ') > 0,\r",
+				"    substring(toString(HoraSalida), 12, 8),\r",
+				"    iif(\r",
+				"        length(toString(HoraSalida)) == 5,\r",
+				"        concat(toString(HoraSalida), ':00'),\r",
+				"        toString(HoraSalida)\r",
+				"    )\r",
+				"),",
+				"          HoraLlegada = iif(\r",
+				"    instr(toString(HoraSalida), 'T') > 0\r",
+				"    || instr(toString(HoraSalida), ' ') > 0,\r",
+				"    substring(toString(HoraSalida), 12, 8),\r",
+				"    iif(\r",
+				"        length(toString(HoraSalida)) == 5,\r",
+				"        concat(toString(HoraSalida), ':00'),\r",
+				"        toString(HoraSalida)\r",
+				"    )\r",
+				")) ~> derivedColumn2",
+				"derivedColumn2 derive(ValidacionesTarjeta = toInteger(trim(toString(ValidacionesTarjeta))),",
+				"          KmRecorridos = toDecimal(replace(trim(toString(KmRecorridos)), ',', '.'), 8, 1),",
+				"          EstadoViaje = upper(trim(toString(EstadoViaje)))) ~> derivedColumn3",
+				"derivedColumn3 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
 			]
 		}
 	}
