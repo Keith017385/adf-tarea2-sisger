@@ -142,7 +142,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "df_bronze_incidentes",
+						"referenceName": "df_silver_incidentes",
 						"type": "DataFlowReference"
 					},
 					"compute": {
@@ -204,7 +204,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "df_bronze_demanda_paradas",
+						"referenceName": "df_silver_demanda_paradas",
 						"type": "DataFlowReference"
 					},
 					"compute": {
