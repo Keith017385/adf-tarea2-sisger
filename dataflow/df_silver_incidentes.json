@@ -36,6 +36,9 @@
 				},
 				{
 					"name": "filter2"
+				},
+				{
+					"name": "filter3"
 				}
 			],
 			"scriptLines": [
@@ -113,10 +116,11 @@
 				")) ~> derivedColumn2",
 				"derivedColumn2 derive(VehiculoId = iif(\r",
 				"    isNull(VehiculoId) || trim(toString(VehiculoId)) == '',\r",
-				"    'V-000',\r",
+				"    toString(null()),\r",
 				"    upper(trim(toString(VehiculoId)))\r",
 				")) ~> derivedColumn3",
-				"derivedColumn3 filter(!isNull(FechaHoraRegistro)) ~> filter2",
+				"filter3 filter(!isNull(FechaHoraRegistro)) ~> filter2",
+				"derivedColumn3 filter(!isNull(VehiculoId) && trim(toString(VehiculoId)) != '') ~> filter3",
 				"filter2 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
